@@ -4,8 +4,8 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'device.yaml'      # Запуск ТОЛЬКО при изменении device.yaml
-  workflow_dispatch:       # И ручной запуск
+      - 'jnge-wind-solar-controller.yaml'
+  workflow_dispatch:      
 
 jobs:
   build-firmware:
@@ -16,15 +16,15 @@ jobs:
       - name: 📥 Получаем репозиторий
         uses: actions/checkout@v4
       
-      # 2. Проверяем, что device.yaml существует
+      # 2. Проверяем, что jnge-wind-solar-controller.yaml существует
       - name: 🔍 Проверка конфига
         run: |
-          if [ ! -f "device.yaml" ]; then
-            echo "❌ Ошибка: файл device.yaml не найден!"
-            echo "Создайте device.yaml с конфигурацией ESPHome"
+          if [ ! -f "jnge-wind-solar-controller.yaml" ]; then
+            echo "❌ Ошибка: файл jnge-wind-solar-controller.yaml не найден!"
+            echo "Создайте jnge-wind-solar-controller.yaml с конфигурацией ESPHome"
             exit 1
           fi
-          echo "✅ device.yaml найден"
+          echo "✅ jnge-wind-solar-controller.yaml найден"
       
       # 3. Устанавливаем Python
       - name: 🐍 Устанавливаем Python
@@ -39,7 +39,7 @@ jobs:
       # 5. Секреты (опционально)
       - name: 🔐 Настраиваем секреты
         run: |
-          if grep -q "!secret" "device.yaml"; then
+          if grep -q "!secret" "jnge-wind-solar-controller.yaml"; then
             echo "🔐 Создаю файл secrets.yaml"
             cat > secrets.yaml << 'EOF'
           wifi_ssid: "${{ secrets.WIFI_SSID }}"
@@ -54,14 +54,14 @@ jobs:
       
       # 6. Компилируем
       - name: 🛠️ Компилируем прошивку
-        run: esphome compile device.yaml
+        run: esphome compile jnge-wind-solar-controller.yaml
       
       # 7. Получаем имя устройства
       - name: 🏷️ Определяем имя устройства
         id: get_device
         run: |
-          # Извлекаем имя устройства из device.yaml
-          NAME=$(grep -m1 "^  name:" device.yaml || grep -m1 "^name:" device.yaml)
+          # Извлекаем имя устройства из jnge-wind-solar-controller.yaml
+          NAME=$(grep -m1 "^  name:" jnge-wind-solar-controller.yaml || grep -m1 "^name:" jnge-wind-solar-controller.yaml)
           DEVICE_NAME=$(echo "$NAME" | awk -F: '{print $2}' | tr -d ' "')
           
           if [ -z "$DEVICE_NAME" ]; then
@@ -129,15 +129,15 @@ jobs:
           =========================================
           ⚙️ КОНФИГУРАЦИЯ УСТРОЙСТВА:
           
-          Платформа: $(grep -m1 "platform:" device.yaml || echo "Не указана")
-          Плата: $(grep -m1 "board:" device.yaml | sed 's/.*://' | tr -d ' "')
+          Платформа: $(grep -m1 "platform:" jnge-wind-solar-controller.yaml || echo "Не указана")
+          Плата: $(grep -m1 "board:" jnge-wind-solar-controller.yaml | sed 's/.*://' | tr -d ' "')
           
           =========================================
           ❓ ПОМОЩЬ:
           
           • Ошибка при прошивке: проверьте подключение и выбранный порт
-          • Устройство не подключается к Wi-Fi: проверьте настройки в device.yaml
-          • Нужна новая прошивка: измените device.yaml и запустите сборку заново
+          • Устройство не подключается к Wi-Fi: проверьте настройки в jnge-wind-solar-controller.yaml
+          • Нужна новая прошивка: измените jnge-wind-solar-controller.yaml и запустите сборку заново
           
           =========================================
           EOF
