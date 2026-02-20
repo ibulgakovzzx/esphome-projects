@@ -40,9 +40,12 @@ api:
     key: "iK7hBA8H+YVlZ6iLa02yU85hk1wFJbmd2rIGaBTW/0k="
 
 uart:
+  id: uart_0
   baud_rate: 9600
   tx_pin: ${tx_pin}
   rx_pin: ${rx_pin}
+  debug:
+    direction: BOTH
 
 jnge_wind_solar_controller:
   enable_fake_traffic: false
