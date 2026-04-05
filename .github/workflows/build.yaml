@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'jnge-wind-solar-controller.yaml'
+      - 'powmr.yaml'
   workflow_dispatch:      
 
 jobs:
@@ -16,15 +16,15 @@ jobs:
       - name: 📥 Получаем репозиторий
         uses: actions/checkout@v4
       
-      # 2. Проверяем, что jnge-wind-solar-controller.yaml существует
+      # 2. Проверяем, что powmr.yaml существует
       - name: 🔍 Проверка конфига
         run: |
-          if [ ! -f "jnge-wind-solar-controller.yaml" ]; then
-            echo "❌ Ошибка: файл jnge-wind-solar-controller.yaml не найден!"
-            echo "Создайте jnge-wind-solar-controller.yaml с конфигурацией ESPHome"
+          if [ ! -f "powmr.yaml" ]; then
+            echo "❌ Ошибка: файл powmr.yaml не найден!"
+            echo "Создайте powmr.yaml с конфигурацией ESPHome"
             exit 1
           fi
-          echo "✅ jnge-wind-solar-controller.yaml найден"
+          echo "✅ powmr.yaml найден"
       
       # 3. Устанавливаем Python
       - name: 🐍 Устанавливаем Python
@@ -39,7 +39,7 @@ jobs:
       # 5. Секреты (опционально)
       - name: 🔐 Настраиваем секреты
         run: |
-          if grep -q "!secret" "jnge-wind-solar-controller.yaml"; then
+          if grep -q "!secret" "powmr.yaml"; then
             echo "🔐 Создаю файл secrets.yaml"
             cat > secrets.yaml << 'EOF'
           wifi_ssid: "TP-Link_F0F4"
@@ -54,14 +54,14 @@ jobs:
       
       # 6. Компилируем
       - name: 🛠️ Компилируем прошивку
-        run: esphome compile jnge-wind-solar-controller.yaml
+        run: esphome compile powmr.yaml
       
       # 7. Получаем имя устройства
       - name: 🏷️ Определяем имя устройства
         id: get_device
         run: |
-          # Извлекаем имя устройства из jnge-wind-solar-controller.yaml
-          NAME=$(grep -m1 "^  name:" jnge-wind-solar-controller.yaml || grep -m1 "^name:" jnge-wind-solar-controller.yaml)
+          # Извлекаем имя устройства из powmr.yaml
+          NAME=$(grep -m1 "^  name:" powmr.yaml || grep -m1 "^name:" powmr.yaml)
           DEVICE_NAME=$(echo "$NAME" | awk -F: '{print $2}' | tr -d ' "')
           
           if [ -z "$DEVICE_NAME" ]; then
@@ -129,15 +129,15 @@ jobs:
           =========================================
           ⚙️ КОНФИГУРАЦИЯ УСТРОЙСТВА:
           
-          Платформа: $(grep -m1 "platform:" jnge-wind-solar-controller.yaml || echo "Не указана")
-          Плата: $(grep -m1 "board:" jnge-wind-solar-controller.yaml | sed 's/.*://' | tr -d ' "')
+          Платформа: $(grep -m1 "platform:" powmr.yaml || echo "Не указана")
+          Плата: $(grep -m1 "board:" powmr.yaml | sed 's/.*://' | tr -d ' "')
           
           =========================================
           ❓ ПОМОЩЬ:
           
           • Ошибка при прошивке: проверьте подключение и выбранный порт
-          • Устройство не подключается к Wi-Fi: проверьте настройки в jnge-wind-solar-controller.yaml
-          • Нужна новая прошивка: измените jnge-wind-solar-controller.yaml и запустите сборку заново
+          • Устройство не подключается к Wi-Fi: проверьте настройки в powmr.yaml
+          • Нужна новая прошивка: измените powmr.yaml и запустите сборку заново
           
           =========================================
           EOF
