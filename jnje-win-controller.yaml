@@ -39,7 +39,16 @@ ota:
   platform: esphome
 
 logger:
-  level: DEBUG
+  level: VERY_VERBOSE
+  logs:
+    uart: DEBUG
+    uart.idf: DEBUG
+    jnge_modbus: VERY_VERBOSE
+    jnge_wind_solar_controller: VERY_VERBOSE
+    sensor: INFO
+    text_sensor: INFO
+    binary_sensor: INFO
+    switch: INFO
 
 api:
   encryption:
@@ -51,7 +60,6 @@ uart:
   rx_pin: ${rx_pin}
 
 jnge_wind_solar_controller:
-  address: 0x01       # попробуй 0x01, 0x02, 0xFF если не отвечает
   enable_fake_traffic: false
   update_interval: 2s
 
