@@ -3,10 +3,8 @@ substitutions:
   status: "status"
   config: "config"
   device_description: "JNGE Wind/Solar Controller via WeAct CAN485"
-  external_components_source: github://syssi/esphome-jnge-mppt-controller@main
-  # WeAct CAN485 RS485 pins
-  tx_pin: GPIO22   # DI (TX → RS485)
-  rx_pin: GPIO21   # RO (RX ← RS485)
+  tx_pin: GPIO22
+  rx_pin: GPIO21
 
 esphome:
   name: ${name}
@@ -17,14 +15,19 @@ esphome:
     version: 1.6.0
 
 esp32:
-  board: esp32dev   # Generic ESP32 — WeAct CAN485 базируется на стандартном ESP32
+  board: esp32dev
   framework:
     type: esp-idf
     advanced:
-      ignore_efuse_mac_crc: false   # нужно для ESP32-D0WD-V3 rev 3.1
+      minimum_chip_revision: "3.1"
+      sram1_as_iram: true
 
 external_components:
-  - source: ${external_components_source}
+  - source:
+      type: git
+      url: https://github.com/syssi/esphome-jnge-mppt-controller
+      ref: main
+    components: [jnge_modbus, jnge_wind_solar_controller]
     refresh: 0s
 
 wifi:
@@ -38,28 +41,17 @@ ota:
 logger:
   level: DEBUG
 
-# Home Assistant native API (убери mqtt секцию если используешь HA)
 api:
   encryption:
     key: !secret api_encryption_key
-
-# Раскомментируй если хочешь MQTT вместо native API:
-# mqtt:
-#   broker: !secret mqtt_host
-#   username: !secret mqtt_username
-#   password: !secret mqtt_password
 
 uart:
   baud_rate: 9600
   tx_pin: ${tx_pin}
   rx_pin: ${rx_pin}
-  # WeAct CAN485 имеет аппаратный DE pin (GPIO17), ESPHome JNGE компонент
-  # управляет направлением через самот RS485 модуль автоматически.
-  # Если связь не работает, добавь явно:
-  # stop_bits: 1
-  # parity: NONE
 
 jnge_wind_solar_controller:
+  address: 0x01       # попробуй 0x01, 0x02, 0xFF если не отвечает
   enable_fake_traffic: false
   update_interval: 2s
 
