@@ -60,7 +60,7 @@ uart:
   rx_pin: ${rx_pin}
 
 jnge_wind_solar_controller:
-  address: 0x01
+  address: 0xFF
   enable_fake_traffic: false
   update_interval: 2s
 
