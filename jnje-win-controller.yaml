@@ -60,6 +60,7 @@ uart:
   rx_pin: ${rx_pin}
 
 jnge_wind_solar_controller:
+  address: 0x01
   enable_fake_traffic: false
   update_interval: 2s
 
@@ -124,3 +125,10 @@ text_sensor:
       name: "${status} errors"
     operation_mode:
       name: "${status} operation mode"
+button:
+  - platform: template
+    name: "Test RS485 raw"
+    on_press:
+      - uart.write:
+          # Modbus запрос: адрес 0x01, функция 0x03, регистр 0x0000, кол-во 0x0020, CRC
+          data: [0x01, 0x03, 0x00, 0x00, 0x00, 0x20, 0x44, 0x06]
