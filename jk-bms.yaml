@@ -261,8 +261,6 @@ sensor:
       name: "${name} total runtime"
     balancing_current:
       name: "${name} balancing current"
-    errors_bitmask:
-      name: "${name} errors bitmask"
 
 switch:
   - platform: jk_bms_ble
@@ -288,4 +286,6 @@ text_sensor:
       name: "${name} software version"
     hardware_version:
       name: "${name} hardware version"
+    errors_bitmask_hex:
+      name: jk-bms errors bitmask
     
