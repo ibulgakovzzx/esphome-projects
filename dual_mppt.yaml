@@ -1,0 +1,137 @@
+substitutions:
+  name: dual_mppt
+  friendly_name: "Dual MPPT Wind Solar"
+  device_description: "Dual MPPT Wind/Solar via WeAct CAN485 RS485"
+  external_components_source: github://syssi/esphome-jnge-mppt-controller@main
+  # WeAct CAN485 DevBoard RS485 pins
+  tx_pin: GPIO22
+  rx_pin: GPIO21
+  flow_control_pin: GPIO17
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  comment: ${device_description}
+  project:
+    name: "syssi.esphome-jnge-mppt-controller"
+    version: 1.6.0
+esp32:
+  board: esp32dev
+  flash_size: 8MB
+  framework:
+    type: arduino
+external_components:
+  - source: ${external_components_source}
+    refresh: 0s
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "${friendly_name} Fallback"
+    password: "12345678"
+captive_portal:
+api:
+  encryption:
+    key: !secret api_encryption_key
+ota:
+  - platform: esphome
+logger:
+  level: DEBUG
+# RS485 UART
+uart:
+  id: uart_bus
+  baud_rate: 9600
+  tx_pin: ${tx_pin}
+  rx_pin: ${rx_pin}
+  debug:
+    direction: BOTH
+# Свой Modbus-стек JNGE (НЕ стандартный modbus:)
+jnge_modbus:
+  id: modbus0
+  uart_id: uart_bus
+  flow_control_pin: ${flow_control_pin}
+# Контроллер ветро-солнечный JNGE (адрес по умолчанию 0x06)
+jnge_wind_solar_controller:
+  id: jnge0
+  jnge_modbus_id: modbus0
+  address: 0x06
+  enable_fake_traffic: false
+  update_interval: 2s
+binary_sensor:
+  - platform: jnge_wind_solar_controller
+    jnge_wind_solar_controller_id: jnge0
+    load_detected:
+      name: "Load detected"
+    load:
+      name: "Load"
+    charging:
+      name: "Charging"
+sensor:
+  - platform: jnge_wind_solar_controller
+    jnge_wind_solar_controller_id: jnge0
+    firmware_version:
+      name: "Firmware version"
+    battery_voltage:
+      name: "Battery voltage"
+      unit_of_measurement: "V"
+      device_class: voltage
+      state_class: measurement
+    pv_voltage:
+      name: "PV voltage"
+      unit_of_measurement: "V"
+      device_class: voltage
+      state_class: measurement
+    fan_voltage:
+      name: "Wind voltage"
+      unit_of_measurement: "V"
+      device_class: voltage
+      state_class: measurement
+    pv_charging_current:
+      name: "PV charging current"
+      unit_of_measurement: "A"
+      device_class: current
+      state_class: measurement
+    fan_charging_current:
+      name: "Wind charging current"
+      unit_of_measurement: "A"
+      device_class: current
+      state_class: measurement
+    pv_charging_power:
+      name: "PV charging power"
+      unit_of_measurement: "W"
+      device_class: power
+      state_class: measurement
+    fan_charging_power:
+      name: "Wind charging power"
+      unit_of_measurement: "W"
+      device_class: power
+      state_class: measurement
+    pv_total_energy:
+      name: "PV total energy"
+      unit_of_measurement: "kWh"
+      device_class: energy
+      state_class: total_increasing
+    fan_total_energy:
+      name: "Wind total energy"
+      unit_of_measurement: "kWh"
+      device_class: energy
+      state_class: total_increasing
+    error_bitmask:
+      name: "Error bitmask"
+switch:
+  - platform: jnge_wind_solar_controller
+    jnge_wind_solar_controller_id: jnge0
+    charging:
+      name: "Charging"
+    load:
+      name: "Load output"
+    street_light_mode:
+      name: "Street light mode"
+text_sensor:
+  - platform: jnge_wind_solar_controller
+    jnge_wind_solar_controller_id: jnge0
+    battery_type:
+      name: "Battery type"
+    errors:
+      name: "Errors"
+    operation_mode:
+      name: "Operation mode"
