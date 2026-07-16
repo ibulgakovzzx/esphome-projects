@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'jk-bms.yaml'
+      - 'dual_mppt.yaml'
   workflow_dispatch:      
 
 jobs:
@@ -16,15 +16,15 @@ jobs:
       - name: 📥 Получаем репозиторий
         uses: actions/checkout@v4
       
-      # 2. Проверяем, что jk-bms.yaml существует
+      # 2. Проверяем, что dual_mppt.yaml существует
       - name: 🔍 Проверка конфига
         run: |
-          if [ ! -f "jk-bms.yaml" ]; then
-            echo "❌ Ошибка: файл jk-bms.yaml не найден!"
-            echo "Создайте jk-bms.yaml с конфигурацией ESPHome"
+          if [ ! -f "dual_mppt.yaml" ]; then
+            echo "❌ Ошибка: файл dual_mppt.yaml не найден!"
+            echo "Создайте dual_mppt.yaml с конфигурацией ESPHome"
             exit 1
           fi
-          echo "✅ jk-bms.yaml найден"
+          echo "✅ dual_mppt.yaml найден"
       
       # 3. Устанавливаем Python
       - name: 🐍 Устанавливаем Python
@@ -39,7 +39,7 @@ jobs:
       # 5. Секреты (опционально)
       - name: 🔐 Настраиваем секреты
         run: |
-          if grep -q "!secret" "jk-bms.yaml"; then
+          if grep -q "!secret" "dual_mppt.yaml"; then
             echo "🔐 Создаю файл secrets.yaml"
             cat > secrets.yaml << 'EOF'
           wifi_ssid: "TP-Link_F0F4"
@@ -54,14 +54,14 @@ jobs:
       
       # 6. Компилируем
       - name: 🛠️ Компилируем прошивку
-        run: esphome compile jk-bms.yaml
+        run: esphome compile dual_mppt.yaml
       
       # 7. Получаем имя устройства
       - name: 🏷️ Определяем имя устройства
         id: get_device
         run: |
-          # Извлекаем имя устройства из jk-bms.yaml
-          NAME=$(grep -m1 "^  name:" jk-bms.yaml || grep -m1 "^name:" jk-bms.yaml)
+          # Извлекаем имя устройства из dual_mppt.yaml
+          NAME=$(grep -m1 "^  name:" dual_mppt.yaml || grep -m1 "^name:" dual_mppt.yaml)
           DEVICE_NAME=$(echo "$NAME" | awk -F: '{print $2}' | tr -d ' "')
           
           if [ -z "$DEVICE_NAME" ]; then
@@ -129,15 +129,15 @@ jobs:
           =========================================
           ⚙️ КОНФИГУРАЦИЯ УСТРОЙСТВА:
           
-          Платформа: $(grep -m1 "platform:" jk-bms.yaml || echo "Не указана")
-          Плата: $(grep -m1 "board:" jk-bms.yaml | sed 's/.*://' | tr -d ' "')
+          Платформа: $(grep -m1 "platform:" dual_mppt.yaml || echo "Не указана")
+          Плата: $(grep -m1 "board:" dual_mppt.yaml | sed 's/.*://' | tr -d ' "')
           
           =========================================
           ❓ ПОМОЩЬ:
           
           • Ошибка при прошивке: проверьте подключение и выбранный порт
-          • Устройство не подключается к Wi-Fi: проверьте настройки в jk-bms.yaml
-          • Нужна новая прошивка: измените jk-bms.yaml и запустите сборку заново
+          • Устройство не подключается к Wi-Fi: проверьте настройки в dual_mppt.yaml
+          • Нужна новая прошивка: измените dual_mppt.yaml и запустите сборку заново
           
           =========================================
           EOF
