@@ -53,17 +53,8 @@ modbus_controller:
   - id: mppt
     address: 0x06
     modbus_id: modbus0
-    update_interval: 5s
-    # ВАЖНО: у платы лимит длины запроса (~10 регистров).
-    # modbus_controller сам смёрджит соседние адреса, поэтому
-    # держим все сенсоры в компактном диапазоне 0x03..0x0D (11 рег.).
-    # Если снова словите exception 0x02 из-за длины —
-    # раскомментируйте второй контроллер mppt2 ниже и разнесите блоки.
+    update_interval: 2s
 
-# ============================================================
-#  INPUT-РЕГИСТРЫ (Modbus function 0x04 == register_type: read)
-#  Карта подтверждена по дисплею контроллера.
-# ============================================================
 sensor:
   - platform: modbus_controller
     modbus_controller_id: mppt
