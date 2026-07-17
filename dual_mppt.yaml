@@ -100,7 +100,7 @@ sensor:
     state_class: measurement
     accuracy_decimals: 0
 
-  # По дисплею: 0x06 = ток ветра, 0x08 = напряжение ветра
+  # 0x06 = ток ветра, 0x08 = напряжение ветра
   - platform: modbus_controller
     modbus_controller_id: mppt
     name: "Wind current"
@@ -137,7 +137,6 @@ sensor:
     accuracy_decimals: 1
     filters: [{ multiply: 0.1 }]
 
-  # По аналогии с ветром: 0x09 = ток PV, 0x0A = напряжение PV
   - platform: modbus_controller
     modbus_controller_id: mppt
     name: "PV current"
@@ -150,28 +149,29 @@ sensor:
     accuracy_decimals: 1
     filters: [{ multiply: 0.1 }]
 
+  # По дисплею: 0x0A = мощность ветра, 0x0B = напряжение PV
+  - platform: modbus_controller
+    modbus_controller_id: mppt
+    name: "Wind power"
+    register_type: read
+    address: 0x000A
+    value_type: U_WORD
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: measurement
+    accuracy_decimals: 0
+
   - platform: modbus_controller
     modbus_controller_id: mppt
     name: "PV voltage"
     register_type: read
-    address: 0x000A
+    address: 0x000B
     value_type: U_WORD
     unit_of_measurement: "V"
     device_class: voltage
     state_class: measurement
     accuracy_decimals: 1
     filters: [{ multiply: 0.1 }]
-
-  - platform: modbus_controller
-    modbus_controller_id: mppt
-    name: "Wind power"
-    register_type: read
-    address: 0x000B
-    value_type: U_WORD
-    unit_of_measurement: "W"
-    device_class: power
-    state_class: measurement
-    accuracy_decimals: 0
 
   - platform: modbus_controller
     modbus_controller_id: mppt
