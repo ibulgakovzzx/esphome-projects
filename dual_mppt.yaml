@@ -62,14 +62,12 @@ modbus_controller:
 
 # ============================================================
 #  INPUT-РЕГИСТРЫ (Modbus function 0x04 == register_type: read)
-#  Смещение −4 относительно документа Wind Solar Controller 1kW.
-#  Документ: Batt=0x07 → у вас 0x03 (подтв.). Применено ко всей карте.
+#  Карта подтверждена по дисплею контроллера.
 # ============================================================
 sensor:
-  # ---------- ПОДТВЕРЖДЕНО ----------
   - platform: modbus_controller
     modbus_controller_id: mppt
-    name: "Battery voltage"        # док 0x07 → у вас 0x03 (539=53.9В ✅)
+    name: "Battery voltage"
     register_type: read
     address: 0x0003
     value_type: U_WORD
@@ -81,20 +79,6 @@ sensor:
 
   - platform: modbus_controller
     modbus_controller_id: mppt
-    name: "Controller temperature" # у вас 0x07 (399=39.9°C ✅)
-    register_type: read
-    address: 0x0007
-    value_type: U_WORD
-    unit_of_measurement: "°C"
-    device_class: temperature
-    state_class: measurement
-    accuracy_decimals: 1
-    filters: [{ multiply: 0.1 }]
-
-  # ---------- ПРЕДПОЛОЖИТЕЛЬНО (смещение −4 от документа) ----------
-  # Документ 0x08 Total Charge Current → у вас 0x04
-  - platform: modbus_controller
-    modbus_controller_id: mppt
     name: "Total charge current"
     register_type: read
     address: 0x0004
@@ -103,9 +87,8 @@ sensor:
     device_class: current
     state_class: measurement
     accuracy_decimals: 1
-    filters: [{ multiply: 0.1 }]   # уточнить днём: 0.1 или 0.01
+    filters: [{ multiply: 0.1 }]
 
-  # Документ 0x09 Total instantaneous power → у вас 0x05
   - platform: modbus_controller
     modbus_controller_id: mppt
     name: "Total power"
@@ -117,51 +100,12 @@ sensor:
     state_class: measurement
     accuracy_decimals: 0
 
-  # Документ 0x0A Wind turbine voltage → у вас 0x06
+  # По дисплею: 0x06 = ток ветра, 0x08 = напряжение ветра
   - platform: modbus_controller
     modbus_controller_id: mppt
-    name: "Wind voltage"
+    name: "Wind current"
     register_type: read
     address: 0x0006
-    value_type: U_WORD
-    unit_of_measurement: "V"
-    device_class: voltage
-    state_class: measurement
-    accuracy_decimals: 1
-    filters: [{ multiply: 0.1 }]
-
-  # Документ 0x0B Wind turbine current → у вас 0x07?
-  # ВНИМАНИЕ: 0x07 у вас уже = температура. Значит смещение
-  # НЕ идеально −4 по всей карте, либо wind current лежит иначе.
-  # Оставляю кандидатов ниже, проверить днём при ветре.
-  - platform: modbus_controller
-    modbus_controller_id: mppt
-    name: "Wind current (candidate 0x08)"
-    register_type: read
-    address: 0x0008
-    value_type: U_WORD
-    accuracy_decimals: 1
-    filters: [{ multiply: 0.1 }]
-
-  # Документ 0x0C Solar panel voltage → кандидат у вас ~0x08..0x0A
-  - platform: modbus_controller
-    modbus_controller_id: mppt
-    name: "PV voltage (candidate 0x09)"
-    register_type: read
-    address: 0x0009
-    value_type: U_WORD
-    unit_of_measurement: "V"
-    device_class: voltage
-    state_class: measurement
-    accuracy_decimals: 1
-    filters: [{ multiply: 0.1 }]
-
-  # Документ 0x0D Solar panel current → кандидат
-  - platform: modbus_controller
-    modbus_controller_id: mppt
-    name: "PV current (candidate 0x0A)"
-    register_type: read
-    address: 0x000A
     value_type: U_WORD
     unit_of_measurement: "A"
     device_class: current
@@ -169,10 +113,58 @@ sensor:
     accuracy_decimals: 1
     filters: [{ multiply: 0.1 }]
 
-  # Документ 0x0E Wind power → кандидат
   - platform: modbus_controller
     modbus_controller_id: mppt
-    name: "Wind power (candidate 0x0B)"
+    name: "Controller temperature"
+    register_type: read
+    address: 0x0007
+    value_type: U_WORD
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    accuracy_decimals: 1
+    filters: [{ multiply: 0.1 }]
+
+  - platform: modbus_controller
+    modbus_controller_id: mppt
+    name: "Wind voltage"
+    register_type: read
+    address: 0x0008
+    value_type: U_WORD
+    unit_of_measurement: "V"
+    device_class: voltage
+    state_class: measurement
+    accuracy_decimals: 1
+    filters: [{ multiply: 0.1 }]
+
+  # По аналогии с ветром: 0x09 = ток PV, 0x0A = напряжение PV
+  - platform: modbus_controller
+    modbus_controller_id: mppt
+    name: "PV current"
+    register_type: read
+    address: 0x0009
+    value_type: U_WORD
+    unit_of_measurement: "A"
+    device_class: current
+    state_class: measurement
+    accuracy_decimals: 1
+    filters: [{ multiply: 0.1 }]
+
+  - platform: modbus_controller
+    modbus_controller_id: mppt
+    name: "PV voltage"
+    register_type: read
+    address: 0x000A
+    value_type: U_WORD
+    unit_of_measurement: "V"
+    device_class: voltage
+    state_class: measurement
+    accuracy_decimals: 1
+    filters: [{ multiply: 0.1 }]
+
+  - platform: modbus_controller
+    modbus_controller_id: mppt
+    name: "Wind power"
     register_type: read
     address: 0x000B
     value_type: U_WORD
@@ -181,10 +173,9 @@ sensor:
     state_class: measurement
     accuracy_decimals: 0
 
-  # Документ 0x0F Solar power → кандидат
   - platform: modbus_controller
     modbus_controller_id: mppt
-    name: "PV power (candidate 0x0C)"
+    name: "PV power"
     register_type: read
     address: 0x000C
     value_type: U_WORD
@@ -193,14 +184,15 @@ sensor:
     state_class: measurement
     accuracy_decimals: 0
 
-  # Документ 0x10/0x11 Total generated (ветер/солнце) — часто 32-бит.
-  # Кандидат, уточнить тип (U_WORD vs U_DWORD) по величине днём.
   - platform: modbus_controller
     modbus_controller_id: mppt
-    name: "Energy total (candidate 0x0D)"
+    name: "Energy total"
     register_type: read
     address: 0x000D
     value_type: U_WORD
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
     accuracy_decimals: 1
     filters: [{ multiply: 0.1 }]
 
